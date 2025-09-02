@@ -9,8 +9,7 @@ const app = express();
 // This function will run on every request and manually set the security headers.
 app.use((req, res, next) => {
   const allowedOrigins = [
-  'https://kmilind27.github.io/your-repo-name', // Replace with actual URL
-  'https://kmilind27.github.io' // Keep this if it's a user site
+  'https://kmilind27.github.io/BiteWise'
 ];
   const origin = req.headers.origin;
 
