@@ -6,12 +6,26 @@ require('dotenv').config();
 const app = express();
 
 // --- ROBUST CORS Configuration ---
-// This line specifically handles the browser's pre-flight "OPTIONS" request.
-// It will respond with a 200 OK and the correct headers, allowing the actual request to proceed.
-app.options('*', cors()); 
+const allowedOrigins = ['https://kmilind27.github.io'];
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests from the specified origin, and also allow
+    // requests that don't have an origin (like from Postman or server-to-server)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+
+// This handles the browser's pre-flight "OPTIONS" request for all routes.
+app.options('*', cors(corsOptions));
 
 // This enables CORS for all other requests.
-app.use(cors());
+app.use(cors(corsOptions));
+
 
 // Middleware to parse incoming JSON data
 app.use(express.json());
@@ -43,22 +57,11 @@ app.post('/api/estimate-macros', async (req, res) => {
                 }
             }
         };
-
-        const response = await fetch(API_URL_BASE, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message);
-        }
+        const response = await fetch(API_URL_BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error.message); }
         const data = await response.json();
         res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // Endpoint for meal suggestions
@@ -67,30 +70,14 @@ app.post('/api/get-suggestion', async (req, res) => {
         const { ingredientsText, mealType } = req.body;
         const systemPrompt = `You are a helpful culinary assistant. Your goal is to provide simple, healthy, and creative meal ideas based on the user's available ingredients. Provide 2-3 distinct options. For each option, give it a name, list the required ingredients from the user's list, and provide a short, easy-to-follow recipe. Format your response in Markdown.`;
         const userQuery = `I have the following ingredients: ${ingredientsText}. Can you suggest a recipe for ${mealType}?`;
-        const payload = {
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            contents: [{ parts: [{ text: userQuery }] }],
-        };
-
-        const response = await fetch(API_URL_BASE, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message);
-        }
+        const payload = { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ parts: [{ text: userQuery }] }] };
+        const response = await fetch(API_URL_BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error.message); }
         const data = await response.json();
         res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
 
