@@ -1,30 +1,33 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors');
+// The cors package is not used in this manual configuration
 require('dotenv').config();
 
 const app = express();
 
-// --- ROBUST CORS Configuration ---
-const allowedOrigins = ['https://kmilind27.github.io'];
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests from the specified origin, and also allow
-    // requests that don't have an origin (like from Postman or server-to-server)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  optionsSuccessStatus: 200 // For legacy browser support
-};
+// --- MANUAL & EXPLICIT CORS MIDDLEWARE ---
+// This function will run on every request and manually set the security headers.
+app.use((req, res, next) => {
+  const allowedOrigins = ['https://kmilind27.github.io'];
+  const origin = req.headers.origin;
 
-// This handles the browser's pre-flight "OPTIONS" request for all routes.
-app.options('*', cors(corsOptions));
-
-// This enables CORS for all other requests.
-app.use(cors(corsOptions));
+  // Set the origin header if it's in our allowed list
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  // Set other necessary CORS headers
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // If this is a pre-flight "OPTIONS" request, end it here with a success status.
+  // This is the crucial step that tells the browser it's safe to send the actual POST request.
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next(); // If it's not a pre-flight request, continue to the next middleware/route.
+});
 
 
 // Middleware to parse incoming JSON data
@@ -80,4 +83,5 @@ app.post('/api/get-suggestion', async (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
+    
 
