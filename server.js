@@ -7,7 +7,7 @@ const app = express();
 
 // --- IMPORTANT: CORS Configuration ---
 // This tells your server to only accept requests from your live frontend.
-const allowedOrigins = ['[https://kmilind27.github.io](https://kmilind27.github.io)'];
+const allowedOrigins = ['https://kmilind27.github.io'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
