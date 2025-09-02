@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteWise - Smart Food Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .meal-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .meal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Simple spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        .loader.\\!w-5.\\!h-5.\\!border-t-white {
+             width: 1.25rem;
+             height: 1.25rem;
+             border-top-color: white;
+        }
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-2xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">BiteWise</h1>
+            <p class="text-gray-600 mt-2">Your smart food and recipe assistant.</p>
+        </header>
+
+        <main class="space-y-8">
+            <!-- Meal Logging Section -->
+            <section id="meal-logging" class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Log Your Meal</h2>
+                <form id="log-meal-form" class="space-y-4">
+                    <div>
+                        <label for="meal-type" class="block text-sm font-medium text-gray-700">Meal</label>
+                        <select id="meal-type" name="meal-type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option>Breakfast</option>
+                            <option>Lunch</option>
+                            <option>Dinner</option>
+                            <option>Snack</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <label for="food-description" class="block text-sm font-medium text-gray-700">What did you eat?</label>
+                        <textarea id="food-description" name="food-description" rows="3" class="mt-1 block w-full py-2 px-3 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Oatmeal with berries and nuts"></textarea>
+                        <button type="button" id="mic-btn" class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-400 hover:text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="calories" class="block text-sm font-medium text-gray-700">Calories</label>
+                            <input type="number" id="calories" name="calories" placeholder="e.g., 350" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                         <div>
+                            <label for="protein" class="block text-sm font-medium text-gray-700">Protein (g)</label>
+                            <input type="number" id="protein" name="protein" placeholder="e.g., 15" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                         <div>
+                            <label for="carbs" class="block text-sm font-medium text-gray-700">Carbs (g)</label>
+                            <input type="number" id="carbs" name="carbs" placeholder="e.g., 45" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                         <div>
+                            <label for="fats" class="block text-sm font-medium text-gray-700">Fats (g)</label>
+                            <input type="number" id="fats" name="fats" placeholder="e.g., 12" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                     <button type="button" id="estimate-macros-btn" class="w-full flex justify-center items-center bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors disabled:opacity-50">
+                        ✨ Estimate Macros with AI
+                    </button>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Log Meal
+                    </button>
+                </form>
+            </section>
+
+            <!-- Ingredient Inventory Section -->
+            <section id="ingredients-inventory" class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">What's in Your Kitchen?</h2>
+                <p class="text-sm text-gray-500 mb-3">List the ingredients you have on hand. Separate them with commas.</p>
+                <div>
+                     <textarea id="ingredients-list" rows="5" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., chicken breast, rice, broccoli, garlic, olive oil, lemon"></textarea>
+                </div>
+                 <button id="save-ingredients-btn" class="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                    Save Ingredients
+                </button>
+            </section>
+
+             <!-- Meal Suggestions Section -->
+            <section id="meal-suggestions" class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Need an Idea?</h2>
+                 <p class="text-sm text-gray-500 mb-3">Get a meal suggestion based on your ingredients.</p>
+                <form id="suggestion-form" class="space-y-4">
+                    <div>
+                        <label for="suggestion-meal-type" class="block text-sm font-medium text-gray-700">Which meal?</label>
+                        <select id="suggestion-meal-type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option>Breakfast</option>
+                            <option>Lunch</option>
+                            <option>Dinner</option>
+                            <option>Any</option>
+                        </select>
+                    </div>
+                    <button id="get-suggestion-btn" type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                       Get Suggestion
+                    </button>
+                </form>
+                <div id="suggestion-output" class="mt-4 prose max-w-none prose-indigo">
+                    <!-- Suggestions will appear here -->
+                    <div id="suggestion-loader" class="hidden justify-center items-center py-4">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Meal History Section -->
+            <section id="meal-history" class="bg-white p-6 rounded-2xl shadow-md">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                    <h2 id="history-title" class="text-2xl font-bold">Today's Log</h2>
+                    <div class="flex items-center gap-2 text-sm">
+                        <input type="date" id="history-date" class="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="view-today-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 transition-colors">Today</button>
+                    </div>
+                </div>
+                <div class="flex justify-end mb-4">
+                     <button id="calculate-totals-btn" class="bg-purple-600 text-white py-1 px-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors text-sm hidden">
+                        Show Totals
+                    </button>
+                </div>
+                <div id="totals-display" class="hidden mb-4 p-4 bg-purple-50 rounded-lg text-sm">
+                    <!-- Totals will be displayed here -->
+                </div>
+                <div id="history-list" class="space-y-4">
+                    <!-- History items will be injected here -->
+                    <p class="text-gray-500">No meals logged yet for today.</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- User ID display -->
+        <footer class="text-center mt-8">
+            <p id="user-id-display" class="text-xs text-gray-400"></p>
+        </footer>
+    </div>
+
+    <!-- Firebase and App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, query, where, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { marked } from "https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.esm.js";
+
+        // --- CONFIG AND INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCGV7uWA1GbSzy6YkWZAA6kuWXFy_bsGEs",
+            authDomain: "foodtracker-239b9.firebaseapp.com",
+            projectId: "foodtracker-239b9",
+            storageBucket: "foodtracker-239b9.appspot.com",
+            messagingSenderId: "427282752803",
+            appId: "1:427282752803:web:783fbd04ca261a2d2ed896",
+            measurementId: "G-JN36YX73ZS"
+        };
+        const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-food-tracker';
+        const appId = rawAppId.replace(/\//g, '_'); // Replace slashes to create a valid path segment
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let userId = null;
+        let isAuthReady = false;
+        let unsubscribeMealHistory = null;
+        let displayedMeals = [];
+
+        // --- DOM ELEMENTS ---
+        const logMealForm = document.getElementById('log-meal-form');
+        const mealTypeEl = document.getElementById('meal-type');
+        const foodDescriptionEl = document.getElementById('food-description');
+        const ingredientsListEl = document.getElementById('ingredients-list');
+        const saveIngredientsBtn = document.getElementById('save-ingredients-btn');
+        const suggestionForm = document.getElementById('suggestion-form');
+        const suggestionMealTypeEl = document.getElementById('suggestion-meal-type');
+        const getSuggestionBtn = document.getElementById('get-suggestion-btn');
+        const suggestionOutputEl = document.getElementById('suggestion-output');
+        const suggestionLoader = document.getElementById('suggestion-loader');
+        const historyListEl = document.getElementById('history-list');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const caloriesEl = document.getElementById('calories');
+        const proteinEl = document.getElementById('protein');
+        const carbsEl = document.getElementById('carbs');
+        const fatsEl = document.getElementById('fats');
+        const estimateMacrosBtn = document.getElementById('estimate-macros-btn');
+        const micBtn = document.getElementById('mic-btn');
+        const calculateTotalsBtn = document.getElementById('calculate-totals-btn');
+        const totalsDisplayEl = document.getElementById('totals-display');
+        const historyDateEl = document.getElementById('history-date');
+        const viewTodayBtn = document.getElementById('view-today-btn');
+        const historyTitleEl = document.getElementById('history-title');
+        
+        // --- SPEECH RECOGNITION SETUP ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.trim();
+                const currentText = foodDescriptionEl.value.trim();
+                foodDescriptionEl.value = currentText ? `${currentText} ${transcript}` : transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                if(event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    alert('Microphone access was denied. Please allow microphone access in your browser settings to use this feature.');
+                }
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                micBtn.classList.remove('text-red-600');
+            };
+            
+        } else {
+            micBtn.style.display = 'none';
+            console.warn("Speech Recognition API not supported in this browser.");
+        }
+
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                isAuthReady = true;
+                userIdDisplay.textContent = `User ID: ${userId}`;
+                initializeAppLogic();
+            }
+        });
+        
+        (async () => {
+            try {
+                await setPersistence(auth, inMemoryPersistence);
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                suggestionOutputEl.innerHTML = `<p class="text-red-500">Authentication failed. Please refresh.</p>`;
+            }
+        })();
+
+
+        // --- APP LOGIC ---
+        function initializeAppLogic() {
+            if (!isAuthReady || !userId) return;
+
+            loadIngredients();
+            listenForMealHistory(); // Initially load today's meals
+
+            logMealForm.addEventListener('submit', handleLogMeal);
+            saveIngredientsBtn.addEventListener('click', handleSaveIngredients);
+            suggestionForm.addEventListener('submit', handleGetSuggestion);
+            estimateMacrosBtn.addEventListener('click', handleEstimateMacros);
+            calculateTotalsBtn.addEventListener('click', handleToggleTotals);
+            historyListEl.addEventListener('click', handleDeleteClick);
+            historyDateEl.addEventListener('change', handleDateChange);
+            viewTodayBtn.addEventListener('click', handleViewToday);
+
+
+            if(SpeechRecognition) {
+                 micBtn.addEventListener('click', toggleListening);
+            }
+
+            // Check if the day has changed every minute
+            let lastKnownDate = new Date().getDate();
+            setInterval(() => {
+                const newDate = new Date().getDate();
+                if (newDate !== lastKnownDate) {
+                    console.log('New day detected, refreshing meal log.');
+                    lastKnownDate = newDate;
+                    // If user is not viewing a past date, refresh to the new day
+                    if (!historyDateEl.value) {
+                         handleViewToday();
+                    }
+                }
+            }, 60000); // 60 seconds
+        }
+
+        // --- SPEECH RECOGNITION LOGIC ---
+        function toggleListening() {
+            if (!recognition) return;
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                    isListening = true;
+                    micBtn.classList.add('text-red-600');
+                } catch(err) {
+                    console.error("Error starting speech recognition:", err);
+                    alert("Could not start voice recognition. It might already be active.");
+                }
+            }
+        }
+
+        // --- FIRESTORE REFERENCES ---
+        const ingredientsDocRef = () => doc(db, 'artifacts', appId, 'users', userId, 'pantry', 'ingredients');
+        const mealsCollectionRef = () => collection(db, 'artifacts', appId, 'users', userId, 'meals');
+
+        // --- INGREDIENTS MANAGEMENT ---
+        async function loadIngredients() {
+            try {
+                const docSnap = await getDoc(ingredientsDocRef());
+                if (docSnap.exists()) {
+                    ingredientsListEl.value = docSnap.data().list.join(', ');
+                }
+            } catch (error) {
+                console.error("Error loading ingredients:", error);
+            }
+        }
+
+        async function handleSaveIngredients(e) {
+            e.preventDefault();
+            const ingredients = ingredientsListEl.value.split(',').map(s => s.trim()).filter(Boolean);
+            if(ingredients.length === 0) {
+                 alert('Please enter at least one ingredient.');
+                 return;
+            }
+            try {
+                await setDoc(ingredientsDocRef(), { list: ingredients });
+                // Simple feedback
+                saveIngredientsBtn.textContent = 'Saved!';
+                setTimeout(() => { saveIngredientsBtn.textContent = 'Save Ingredients'; }, 2000);
+            } catch (error) {
+                console.error("Error saving ingredients:", error);
+                alert('Could not save ingredients. Check console for errors.');
+            }
+        }
+
+        // --- MEAL LOGGING & HISTORY ---
+        async function handleLogMeal(e) {
+            e.preventDefault();
+            const mealType = mealTypeEl.value;
+            const description = foodDescriptionEl.value.trim();
+            const calories = parseFloat(caloriesEl.value) || 0;
+            const protein = parseFloat(proteinEl.value) || 0;
+            const carbs = parseFloat(carbsEl.value) || 0;
+            const fats = parseFloat(fatsEl.value) || 0;
+
+            if (!description) {
+                alert('Please describe what you ate.');
+                return;
+            }
+
+            try {
+                await addDoc(mealsCollectionRef(), {
+                    mealType,
+                    description,
+                    calories,
+                    protein,
+                    carbs,
+                    fats,
+                    createdAt: serverTimestamp()
+                });
+                foodDescriptionEl.value = ''; // Clear input after submission
+                caloriesEl.value = '';
+                proteinEl.value = '';
+                carbsEl.value = '';
+                fatsEl.value = '';
+            } catch (error) {
+                console.error("Error logging meal:", error);
+                alert('Could not log meal. Check console for errors.');
+            }
+        }
+        
+        function listenForMealHistory(date = new Date()) {
+            // Unsubscribe from the old listener if it exists
+            if (unsubscribeMealHistory) {
+                unsubscribeMealHistory();
+            }
+
+            const startOfDay = new Date(date);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(date);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const startTimestamp = Timestamp.fromDate(startOfDay);
+            const endTimestamp = Timestamp.fromDate(endOfDay);
+        
+            const q = query(
+                mealsCollectionRef(), 
+                where("createdAt", ">=", startTimestamp), 
+                where("createdAt", "<=", endTimestamp)
+            );
+
+            unsubscribeMealHistory = onSnapshot(q, (snapshot) => {
+                displayedMeals = []; // Clear previous data
+                snapshot.forEach((doc) => {
+                    displayedMeals.push({ id: doc.id, ...doc.data() });
+                });
+                
+                displayedMeals.sort((a, b) => a.createdAt?.seconds - b.createdAt?.seconds);
+
+                renderMealHistory(displayedMeals);
+            }, (error) => {
+                console.error("Error fetching meal history:", error);
+                historyListEl.innerHTML = `<p class="text-red-500">Could not load meal history.</p>`;
+            });
+        }
+
+        function renderMealHistory(meals) {
+            totalsDisplayEl.classList.add('hidden');
+            calculateTotalsBtn.textContent = 'Show Totals';
+
+            if (meals.length === 0) {
+                historyListEl.innerHTML = `<p class="text-gray-500">No meals logged yet for this day.</p>`;
+                calculateTotalsBtn.classList.add('hidden'); // Hide button if no meals
+                return;
+            }
+            
+            calculateTotalsBtn.classList.remove('hidden'); // Show button if there are meals
+            historyListEl.innerHTML = meals.map(meal => `
+                <div class="meal-card relative border-l-4 border-indigo-500 p-4 bg-gray-50 rounded-r-lg">
+                     <button data-id="${meal.id}" class="delete-meal-btn absolute top-2 right-2 text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-100 transition-colors" aria-label="Delete meal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    <div class="flex justify-between items-start mb-2 pr-6">
+                        <div>
+                            <p class="font-bold text-gray-800">${meal.mealType}</p>
+                            <p class="text-gray-600">${meal.description}</p>
+                        </div>
+                        <p class="text-sm font-semibold text-indigo-600 whitespace-nowrap">${meal.calories || 0} kcal</p>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500 border-t pt-2 mt-2">
+                        <span>Protein: <strong>${meal.protein || 0}g</strong></span>
+                        <span>Carbs: <strong>${meal.carbs || 0}g</strong></span>
+                        <span>Fats: <strong>${meal.fats || 0}g</strong></span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleDeleteClick(e) {
+            const deleteBtn = e.target.closest('.delete-meal-btn');
+            if (deleteBtn) {
+                const mealId = deleteBtn.dataset.id;
+                if (mealId) {
+                    handleDeleteMeal(mealId);
+                }
+            }
+        }
+
+        async function handleDeleteMeal(mealId) {
+            if (!userId || !mealId) return;
+            try {
+                const mealDocRef = doc(db, 'artifacts', appId, 'users', userId, 'meals', mealId);
+                await deleteDoc(mealDocRef);
+            } catch (error) {
+                console.error("Error deleting meal:", error);
+            }
+        }
+
+        function handleToggleTotals() {
+            const isHidden = totalsDisplayEl.classList.contains('hidden');
+
+            if (isHidden) {
+                if (displayedMeals.length === 0) return;
+
+                const totals = displayedMeals.reduce((acc, meal) => {
+                    acc.calories += meal.calories || 0;
+                    acc.protein += meal.protein || 0;
+                    acc.carbs += meal.carbs || 0;
+                    acc.fats += meal.fats || 0;
+                    return acc;
+                }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
+                totalsDisplayEl.innerHTML = `
+                    <p class="font-bold text-purple-800 mb-2">Today's Totals:</p>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <span><strong>Total Calories:</strong> ${Math.round(totals.calories)} kcal</span>
+                        <span><strong>Total Protein:</strong> ${Math.round(totals.protein)} g</span>
+                        <span><strong>Total Carbs:</strong> ${Math.round(totals.carbs)} g</span>
+                        <span><strong>Total Fats:</strong> ${Math.round(totals.fats)} g</span>
+                    </div>
+                `;
+                totalsDisplayEl.classList.remove('hidden');
+                calculateTotalsBtn.textContent = 'Hide Totals';
+            } else {
+                totalsDisplayEl.classList.add('hidden');
+                calculateTotalsBtn.textContent = 'Show Totals';
+            }
+        }
+
+        // --- HISTORY VIEW HANDLERS ---
+        function handleDateChange(e) {
+            const dateValue = e.target.value;
+            if (dateValue) {
+                // Timezone offset correction: create date as UTC to avoid timezone shifts
+                const [year, month, day] = dateValue.split('-').map(Number);
+                const selectedDate = new Date(Date.UTC(year, month - 1, day));
+                historyTitleEl.textContent = `Log for ${dateValue}`;
+                listenForMealHistory(selectedDate);
+            }
+        }
+
+        function handleViewToday() {
+            historyTitleEl.textContent = "Today's Log";
+            historyDateEl.value = ''; // Clear the date input
+            listenForMealHistory(new Date());
+        }
+
+        // --- MEAL SUGGESTIONS (CALLING YOUR BACKEND) ---
+        async function handleGetSuggestion(e) {
+            e.preventDefault();
+            const ingredientsText = ingredientsListEl.value.trim();
+            const mealType = suggestionMealTypeEl.value;
+
+            if (!ingredientsText) {
+                suggestionOutputEl.innerHTML = `<p class="text-orange-500">Please save some ingredients first!</p>`;
+                return;
+            }
+
+            suggestionLoader.style.display = 'flex';
+            suggestionOutputEl.innerHTML = '';
+            getSuggestionBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/get-suggestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ingredientsText, mealType })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
+                }
+
+                const result = await response.json();
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    suggestionOutputEl.innerHTML = marked.parse(generatedText);
+                } else {
+                    throw new Error("Invalid response structure from server.");
+                }
+
+            } catch (error) {
+                console.error("Suggestion Error:", error);
+                suggestionOutputEl.innerHTML = `<p class="text-red-500">Sorry, I couldn't get a suggestion. Error: ${error.message}</p>`;
+            } finally {
+                suggestionLoader.style.display = 'none';
+                getSuggestionBtn.disabled = false;
+            }
+        }
+        
+        // --- MACRO ESTIMATION (CALLING YOUR BACKEND) ---
+        async function handleEstimateMacros() {
+            const description = foodDescriptionEl.value.trim();
+            if (!description) {
+                alert("Please describe your meal first.");
+                return;
+            }
+
+            const originalBtnText = estimateMacrosBtn.innerHTML;
+            estimateMacrosBtn.innerHTML = `<div class="loader !w-5 !h-5 !border-t-white"></div>`;
+            estimateMacrosBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/estimate-macros', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description: description })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
+                }
+
+                const result = await response.json();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (jsonText) {
+                    const nutritionData = JSON.parse(jsonText);
+                    caloriesEl.value = Math.round(nutritionData.calories);
+                    proteinEl.value = Math.round(nutritionData.protein);
+                    carbsEl.value = Math.round(nutritionData.carbs);
+                    fatsEl.value = Math.round(nutritionData.fats);
+                } else {
+                    throw new Error("Invalid response structure from server for macro estimation.");
+                }
+
+            } catch (error) {
+                 console.error("Macro Estimation Error:", error);
+                 alert(`Sorry, I couldn't estimate the macros for that meal. Error: ${error.message}`);
+            } finally {
+                estimateMacrosBtn.innerHTML = originalBtnText;
+                estimateMacrosBtn.disabled = false;
+            }
+        }
+    </script>
+
+</body>
+</html>
+
