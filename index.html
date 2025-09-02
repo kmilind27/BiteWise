@@ -188,6 +188,9 @@
         const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-food-tracker';
         const appId = rawAppId.replace(/\//g, '_'); // Replace slashes to create a valid path segment
         
+        // --- IMPORTANT: This URL will point to your live backend after you deploy it ---
+        const backendUrl = 'https://bite-wise-ashen.vercel.app/'; // <-- REPLACE THIS with your Vercel URL
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -553,7 +556,7 @@
             getSuggestionBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/get-suggestion', {
+                const response = await fetch(`${backendUrl}/api/get-suggestion`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ingredientsText, mealType })
@@ -595,7 +598,7 @@
             estimateMacrosBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/estimate-macros', {
+                const response = await fetch(`${backendUrl}/api/estimate-macros`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ description: description })
