@@ -1,18 +1,16 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors'); // Make sure cors is required
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 
-// --- IMPORTANT: CORS Configuration ---
-// This handles the "pre-flight" OPTIONS request for all routes
+// --- CORS Configuration ---
+// Handles the "pre-flight" OPTIONS request for all routes and enables CORS
 app.options('*', cors()); 
-
-// This enables CORS for all other requests from any origin
 app.use(cors());
 
-// This allows the server to understand JSON data
+// Middleware to parse JSON data
 app.use(express.json());
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -22,7 +20,8 @@ const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/ge
 app.post('/api/estimate-macros', async (req, res) => {
     try {
         const { description } = req.body;
-        const systemPrompt = `You are a nutritional information API...`; // Remainder of your logic is the same
+        // --- THIS IS THE CORRECTED PROMPT ---
+        const systemPrompt = `You are a nutritional information API. Given a meal description, you must estimate the calories, protein (in grams), carbohydrates (in grams), and fats (in grams). You must respond ONLY with a valid JSON object. The JSON object should have four keys: "calories", "protein", "carbs", and "fats". The values should be numbers. Do not include any units, markdown, or explanatory text in your response.`;
         const userQuery = `Estimate the nutritional information for: ${description}`;
 
         const payload = {
@@ -60,7 +59,8 @@ app.post('/api/estimate-macros', async (req, res) => {
 app.post('/api/get-suggestion', async (req, res) => {
     try {
         const { ingredientsText, mealType } = req.body;
-        const systemPrompt = `You are a helpful culinary assistant...`; // Remainder of your logic is the same
+        // --- THIS IS THE CORRECTED PROMPT ---
+        const systemPrompt = `You are a helpful culinary assistant. Your goal is to provide simple, healthy, and creative meal ideas based on the user's available ingredients. Provide 2-3 distinct options. For each option, give it a name, list the required ingredients from the user's list, and provide a short, easy-to-follow recipe. Format your response in Markdown.`;
         const userQuery = `I have the following ingredients: ${ingredientsText}. Can you suggest a recipe for ${mealType}?`;
         
         const payload = {
@@ -90,3 +90,4 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+    
