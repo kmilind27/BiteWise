@@ -8,8 +8,10 @@ const app = express();
 // --- MANUAL & EXPLICIT CORS MIDDLEWARE ---
 // This function will run on every request and manually set the security headers.
 app.use((req, res, next) => {
-  const allowedOrigins = ['https://kmilind27.github.io/BiteWise'];
+  const allowedOrigins = ['https://kmilind27.github.io','https://kmilind27.github.io/BiteWise'];
   const origin = req.headers.origin;
+   
+  console.log('Request origin:', origin); 
 
   // Set the origin header if it's in our allowed list
   if (allowedOrigins.includes(origin)) {
