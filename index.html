@@ -171,7 +171,7 @@
     <!-- Firebase and App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, inMemoryPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, query, where, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { marked } from "https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.esm.js";
 
@@ -272,7 +272,7 @@
         
         (async () => {
             try {
-                await setPersistence(auth, inMemoryPersistence);
+                await setPersistence(auth, browserLocalPersistence);
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Authentication Error:", error);
