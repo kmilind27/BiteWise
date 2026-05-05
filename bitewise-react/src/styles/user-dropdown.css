@@ -1,0 +1,23 @@
+.user-dropdown-item {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.user-dropdown-item:hover {
+  background: var(--surface-elevated);
+}
+
+.user-dropdown-item.danger {
+  color: var(--error);
+}
+
+.user-dropdown-item.danger:hover {
+  background: var(--error-light);
+}
