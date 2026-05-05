@@ -78,18 +78,45 @@ export const Dashboard = () => {
     return user?.email?.split('@')[0] || 'there';
   };
 
+  const FeatureNavigation = ({ current }) => {
+    const features = [
+      { id: 'meal-logger', name: 'Meal Logger', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> },
+      { id: 'ingredients', name: 'Inventory', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V9"/></svg> },
+      { id: 'suggestions', name: 'Recipes', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+      { id: 'history', name: 'History', icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg> }
+    ];
+
+    return (
+      <div className="feature-navigation">
+        <button className="btn btn-outline" onClick={() => setActiveFeature(null)}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Dashboard
+        </button>
+        <div className="feature-nav-tabs">
+          {features.map(feature => (
+            <button
+              key={feature.id}
+              className={`feature-nav-tab ${current === feature.id ? 'active' : ''}`}
+              onClick={() => setActiveFeature(feature.id)}
+            >
+              {feature.icon}
+              {feature.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   if (activeFeature === 'meal-logger') {
     return (
       <div className="app-wrapper">
         <Header />
         <main>
-          <button className="btn btn-outline" onClick={() => setActiveFeature(null)} style={{ marginBottom: '1.5rem' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"/>
-              <polyline points="12 19 5 12 12 5"/>
-            </svg>
-            Back to Dashboard
-          </button>
+          <FeatureNavigation current="meal-logger" />
           <MealLogger userId={user.uid} />
         </main>
       </div>
@@ -101,13 +128,7 @@ export const Dashboard = () => {
       <div className="app-wrapper">
         <Header />
         <main>
-          <button className="btn btn-outline" onClick={() => setActiveFeature(null)} style={{ marginBottom: '1.5rem' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"/>
-              <polyline points="12 19 5 12 12 5"/>
-            </svg>
-            Back to Dashboard
-          </button>
+          <FeatureNavigation current="ingredients" />
           <IngredientInventory userId={user.uid} />
         </main>
       </div>
@@ -119,13 +140,7 @@ export const Dashboard = () => {
       <div className="app-wrapper">
         <Header />
         <main>
-          <button className="btn btn-outline" onClick={() => setActiveFeature(null)} style={{ marginBottom: '1.5rem' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"/>
-              <polyline points="12 19 5 12 12 5"/>
-            </svg>
-            Back to Dashboard
-          </button>
+          <FeatureNavigation current="suggestions" />
           <MealSuggestions userId={user.uid} />
         </main>
       </div>
@@ -137,13 +152,7 @@ export const Dashboard = () => {
       <div className="app-wrapper">
         <Header />
         <main>
-          <button className="btn btn-outline" onClick={() => setActiveFeature(null)} style={{ marginBottom: '1.5rem' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"/>
-              <polyline points="12 19 5 12 12 5"/>
-            </svg>
-            Back to Dashboard
-          </button>
+          <FeatureNavigation current="history" />
           <MealHistory userId={user.uid} />
         </main>
       </div>
