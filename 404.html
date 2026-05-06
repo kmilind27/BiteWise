@@ -2,9 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>BiteWise</title>
+    <title>BiteWise - Redirecting...</title>
     <script type="text/javascript">
-      var pathSegmentsToKeep = 1;
+      // GitHub Pages SPA redirect for 404 errors
+      var pathSegmentsToKeep = 1; // Keep '/BiteWise' segment
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
@@ -16,5 +17,9 @@
     </script>
   </head>
   <body>
+    <div style="text-align: center; padding: 50px; font-family: system-ui, sans-serif;">
+      <h2>Redirecting...</h2>
+      <p>If you are not redirected automatically, <a href="/BiteWise/">click here</a>.</p>
+    </div>
   </body>
 </html>
