@@ -32,7 +32,9 @@ export const Dashboard = () => {
     try {
       setShowMenu(false);
       await logout();
-      navigate('/');
+      // Use the base path for GitHub Pages
+      const basename = import.meta.env.PROD ? '/BiteWise' : '';
+      window.location.href = basename + '/';
     } catch (error) {
       console.error('Logout error:', error);
     }

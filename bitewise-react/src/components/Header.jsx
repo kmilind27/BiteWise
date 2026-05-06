@@ -26,7 +26,9 @@ export const Header = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      // Use the base path for GitHub Pages
+      const basename = import.meta.env.PROD ? '/BiteWise' : '';
+      window.location.href = basename + '/';
     } catch (error) {
       console.error('Logout error:', error);
     }
