@@ -32,7 +32,7 @@ export const Dashboard = () => {
     try {
       setShowMenu(false);
       await logout();
-      window.location.href = '/';
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
     }
