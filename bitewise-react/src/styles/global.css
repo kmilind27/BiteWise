@@ -1281,6 +1281,40 @@ select {
     height: 18px;
   }
 
+  .hamburger-dropdown {
+    min-width: 260px;
+    max-width: calc(100vw - 2rem);
+    right: -0.5rem;
+  }
+
+  .hamburger-header {
+    padding: 0.5rem;
+  }
+
+  .user-avatar-small {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .user-name {
+    font-size: 0.85rem;
+  }
+
+  .user-email {
+    font-size: 0.75rem;
+  }
+
+  .hamburger-item {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .hamburger-item svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .footer-main {
     grid-template-columns: 1fr;
     gap: 2rem;
